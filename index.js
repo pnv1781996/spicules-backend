@@ -38,6 +38,12 @@ app.post('/submit-form', async (req, res) => {
     // Validate request body using Zod
     const validatedData = FormSchemaValidator.parse(req.body);
 
+    // Check if phone number already exists
+    const existingForm = await FormModel.findOne({ phone: validatedData.phone });
+    if (existingForm) {
+      return res.status(400).json({ error: 'Phone number already exists' });
+    }
+
     // Create new document in MongoDB
     const formData = new FormModel(validatedData);
     await formData.save();
